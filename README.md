@@ -1,50 +1,148 @@
-# Welcome to your Expo app 👋
+# Pet Tracker (Expo + Firebase Realtime Database)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Ứng dụng **Pet Tracker** giúp theo dõi **vị trí hiện tại** (GPS) của thú cưng (hoặc thiết bị gắn tracker) theo thời gian thực bằng **Firebase Realtime Database** và hiển thị trực quan trên bản đồ (OpenStreetMap) trong app **Expo React Native**.
 
-## Get started
+> Repo này hiện đọc dữ liệu từ node `gps_data` trong Firebase Realtime Database. Phần “ghi GPS lên Firebase” đã được chuẩn bị trong `App.tsx` nhưng đang comment (bạn có thể bật lại nếu muốn app tự lấy GPS của điện thoại và đẩy lên Firebase).
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Tính năng
 
-2. Start the app
+- Hiển thị **vĩ độ / kinh độ** mới nhất từ Firebase Realtime Database
+- **Realtime update**: tự động cập nhật khi `gps_data` thay đổi
+- Xem bản đồ (OpenStreetMap) bằng `WebView`
+- Nút **Reset vị trí**: fetch lại dữ liệu mới nhất từ Firebase
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## Tech Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Expo** / React Native
+- **TypeScript** (`App.tsx`, `AppStyles.ts`)
+- **Firebase Realtime Database**
+- **OpenStreetMap embed** qua `react-native-webview`
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Thư viện chính (trích từ `package.json`):
 
-## Get a fresh project
+- `expo-location`
+- `firebase`
+- `react-native-webview`
+- `expo-linear-gradient`
 
-When you're ready, run:
+---
+
+## Cấu trúc thư mục
+
+- `App.tsx` — Màn hình chính: lắng nghe `gps_data` realtime + hiển thị bản đồ
+- `AppStyles.ts` — StyleSheet
+- `firebaseConfig.js` — Khởi tạo Firebase app + export `db`
+- `assets/` — icon/splash…
+
+---
+
+## Yêu cầu
+
+- Node.js (khuyến nghị bản LTS)
+- Expo CLI (dùng qua `npx`)
+
+---
+
+## Cài đặt
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## Chạy ứng dụng
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npx expo start
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Sau đó bạn có thể mở bằng:
 
-## Join the community
+- **Expo Go** trên điện thoại
+- Android Emulator / iOS Simulator
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Cấu hình Firebase (Quan trọng)
+
+File: `firebaseConfig.js`
+
+Hiện tại `firebaseConfig` đang để trống một số trường (`apiKey`, `messagingSenderId`, `appId`). Bạn cần:
+
+1. Tạo project trên Firebase Console
+2. Tạo **Realtime Database**
+3. Lấy cấu hình Firebase Web App và điền vào:
+
+```js
+const firebaseConfig = {
+  apiKey: "...",
+  authDomain: "...",
+  databaseURL: "...",
+  projectId: "...",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "...",
+};
+```
+
+### Dữ liệu Realtime Database
+
+App đang đọc tại path:
+
+- `gps_data`
+
+Dạng dữ liệu gợi ý:
+
+```json
+{
+  "gps_data": {
+    "latitude": 21.0285,
+    "longitude": 105.8542,
+    "timestamp": "2026-04-24T00:00:00.000Z"
+  }
+}
+```
+
+---
+
+## (Tuỳ chọn) Bật tính năng ghi GPS của điện thoại lên Firebase
+
+Trong `App.tsx` có sẵn code:
+
+- `writeLocation(lat, lng)`
+- `getCurrentLocation()` (xin quyền + lấy GPS)
+
+Hiện đang comment. Nếu bạn muốn app đóng vai trò "thiết bị tracker", bạn có thể:
+
+1. Bỏ comment 2 hàm trên
+2. Gọi `getCurrentLocation()` theo nút bấm hoặc theo timer (ví dụ mỗi 5–10 giây)
+
+> Lưu ý: Khi bật GPS, bạn cần cấu hình permission đúng cho Expo/Android/iOS theo hướng dẫn `expo-location`.
+
+---
+
+## Troubleshooting
+
+- **Không thấy bản đồ / màn hình trắng**: kiểm tra kết nối mạng và `react-native-webview` đã cài đúng.
+- **Không cập nhật realtime**: kiểm tra rules + path `gps_data` trong Firebase Realtime Database.
+- **Lỗi Firebase config**: đảm bảo điền đủ `apiKey`, `appId`, `messagingSenderId`.
+
+---
+
+## Roadmap gợi ý
+
+- Tách cấu hình Firebase ra `.env` (ví dụ dùng `expo-constants` / `dotenv`)
+- Thay OpenStreetMap embed bằng `react-native-maps` (native) để mượt hơn
+- Lưu lịch sử vị trí (`gps_history`) và hiển thị đường đi
+- Thêm xác thực (Firebase Auth) để bảo vệ dữ liệu
+
+---
+
+## License
+
+Chưa khai báo.
