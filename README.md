@@ -2,7 +2,6 @@
 
 Ứng dụng **Pet Tracker** giúp theo dõi **vị trí hiện tại** (GPS) của thú cưng (hoặc thiết bị gắn tracker) theo thời gian thực bằng **Firebase Realtime Database** và hiển thị trực quan trên bản đồ (OpenStreetMap) trong app **Expo React Native**.
 
-> Repo này hiện đọc dữ liệu từ node `gps_data` trong Firebase Realtime Database. Phần “ghi GPS lên Firebase” đã được chuẩn bị trong `App.tsx` nhưng đang comment (bạn có thể bật lại nếu muốn app tự lấy GPS của điện thoại và đẩy lên Firebase).
 
 ---
 
@@ -22,7 +21,7 @@
 - **Firebase Realtime Database**
 - **OpenStreetMap embed** qua `react-native-webview`
 
-Thư viện chính (trích từ `package.json`):
+Thư viện chính :
 
 - `expo-location`
 - `firebase`
@@ -68,56 +67,21 @@ Sau đó bạn có thể mở bằng:
 
 ---
 
-## Cấu hình Firebase (Quan trọng)
-
+## Cấu hình Firebase 
 File: `firebaseConfig.js`
-
-Hiện tại `firebaseConfig` đang để trống một số trường (`apiKey`, `messagingSenderId`, `appId`). Bạn cần:
-
 1. Tạo project trên Firebase Console
 2. Tạo **Realtime Database**
-3. Lấy cấu hình Firebase Web App và điền vào:
+3. Lấy cấu hình Firebase Web App 
 
-```js
-const firebaseConfig = {
-  apiKey: "...",
-  authDomain: "...",
-  databaseURL: "...",
-  projectId: "...",
-  storageBucket: "...",
-  messagingSenderId: "...",
-  appId: "...",
-};
-```
 
-### Dữ liệu Realtime Database
-
-App đang đọc tại path:
-
-- `gps_data`
-
-Dạng dữ liệu gợi ý:
-
-```json
-{
-  "gps_data": {
-    "latitude": 21.0285,
-    "longitude": 105.8542,
-    "timestamp": "2026-04-24T00:00:00.000Z"
-  }
-}
-```
-
----
-
-## (Tuỳ chọn) Bật tính năng ghi GPS của điện thoại lên Firebase
+##  Bật tính năng ghi GPS của điện thoại lên Firebase
 
 Trong `App.tsx` có sẵn code:
 
 - `writeLocation(lat, lng)`
 - `getCurrentLocation()` (xin quyền + lấy GPS)
 
-Hiện đang comment. Nếu bạn muốn app đóng vai trò "thiết bị tracker", bạn có thể:
+Nếu bạn muốn app đóng vai trò "thiết bị tracker", bạn có thể:
 
 1. Bỏ comment 2 hàm trên
 2. Gọi `getCurrentLocation()` theo nút bấm hoặc theo timer (ví dụ mỗi 5–10 giây)
@@ -126,23 +90,3 @@ Hiện đang comment. Nếu bạn muốn app đóng vai trò "thiết bị track
 
 ---
 
-## Troubleshooting
-
-- **Không thấy bản đồ / màn hình trắng**: kiểm tra kết nối mạng và `react-native-webview` đã cài đúng.
-- **Không cập nhật realtime**: kiểm tra rules + path `gps_data` trong Firebase Realtime Database.
-- **Lỗi Firebase config**: đảm bảo điền đủ `apiKey`, `appId`, `messagingSenderId`.
-
----
-
-## Roadmap gợi ý
-
-- Tách cấu hình Firebase ra `.env` (ví dụ dùng `expo-constants` / `dotenv`)
-- Thay OpenStreetMap embed bằng `react-native-maps` (native) để mượt hơn
-- Lưu lịch sử vị trí (`gps_history`) và hiển thị đường đi
-- Thêm xác thực (Firebase Auth) để bảo vệ dữ liệu
-
----
-
-## License
-
-Chưa khai báo.
